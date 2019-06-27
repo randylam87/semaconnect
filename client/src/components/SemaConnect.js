@@ -5,6 +5,7 @@ export default class SemaConnect extends Component {
         super(props);
 
         this.state = {
+            isLoading: true,
             available: null,
             stations: []
         }
@@ -19,6 +20,7 @@ export default class SemaConnect extends Component {
             }
         }).then(response => response.json())
             .then(json => this.setState({
+                isLoading: false,
                 available: json.aaData.stations[0].available,
                 stations: json.aaData.stations.map(station => {
                     return {
@@ -30,27 +32,43 @@ export default class SemaConnect extends Component {
     }
 
     render() {
-        const { available, stations } = this.state;
+        const { isLoading, available, stations } = this.state;
         return (
             <div>
                 {
+                    isLoading && <p>Loading...</p>
+                }
+                
+                {
                     available !== null
-                        && <p>Available: {available}</p>
+                        && <p><b>Stations Available: {available}</b></p>
                 }
 
-                {
-                    stations.length > 0 &&
-                        stations.map((station, index) => 
-                            <div key={index}>
-                                <p>{station.name}</p>
-                                {
-                                    station.status === 'Available'
-                                        ? <p style={{ color: 'green' }}>Status: {station.status}</p>
-                                        : <p style={{ color: 'red' }}>Status: {station.status}</p>
-                                }
-                                
-                            </div>)
-                }
+                <div style={{
+                    display: 'flex',
+                    flexDirection: 'row',
+                    justifyContent: 'center'
+                }}>
+                    {
+                        stations.length > 0 &&
+                            stations.map((station, index) => 
+                                <div
+                                    style={{
+                                        margin: '0 2em'
+                                    }}
+                                    key={index}
+                                >
+                                    <p>{station.name}</p>
+                                    {
+                                        station.status === 'Available'
+                                            ? <p style={{ color: 'green' }}>Status: {station.status}</p>
+                                            : <p style={{ color: 'red' }}>Status: {station.status}</p>
+                                    }
+                                    
+                                </div>)
+                    }
+
+                </div>
             </div>
         )
     }
